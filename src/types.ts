@@ -1,6 +1,6 @@
-export type TutorMode = 'concept' | 'assignment' | 'quiz' | 'analogy';
+export type TutorMode = 'concept' | 'assignment' | 'analogy' | 'quiz';
 
-export type StudentLevel = 'primary' | 'secondary' | 'ol_al' | 'university' | 'beginner';
+export type StudentLevel = 'elementary' | 'middle_school' | 'high_school' | 'university' | 'beginner';
 
 export interface ChatMessage {
   id: string;
@@ -12,14 +12,13 @@ export interface ChatMessage {
   conceptMetadata?: {
     topic?: string;
     analogyTitle?: string;
-    englishTerms?: { term: string; sinhalaMeaning: string }[];
+    keyTerms?: { term: string; explanation: string }[];
   };
 }
 
 export interface TopicSuggestion {
   id: string;
   title: string;
-  sinhalaTitle: string;
   category: 'science' | 'math' | 'it' | 'economics' | 'physics' | 'daily';
   categoryLabel: string;
   prompt: string;
@@ -31,16 +30,31 @@ export interface TopicSuggestion {
 export interface SocraticStep {
   stepNumber: number;
   title: string;
-  description: string;
-  completed: boolean;
+  guidingQuestion: string;
+}
+
+export interface AssignmentRoadmap {
+  problemSubject: string;
+  keyPrinciples: string[];
+  steps: SocraticStep[];
+  starterMessage: string;
+}
+
+export interface AnalogyExploration {
+  title: string;
+  shortSummary: string;
+  everydayAnalogy: string;
+  keyMechanics: string[];
+  vocabulary: { term: string; definition: string }[];
   guidingQuestion: string;
 }
 
 export interface QuizQuestion {
   id: string;
-  questionSinhala: string;
+  question: string;
   options: string[];
   correctIndex: number;
-  explanationSinhala: string;
+  explanation: string;
   analogyClue: string;
 }
+

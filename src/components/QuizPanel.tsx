@@ -16,10 +16,10 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
   const [showResults, setShowResults] = useState(false);
 
   const starterTopics = [
-    'විද්‍යාව: ප්‍රභාසංස්ලේෂණය',
-    'භෞතික විද්‍යාව: නිව්ටන්ගේ නියම',
-    'පරිගණක: ඇල්ගොරිතම සහ Functions',
-    'ආර්ථිකය: උද්ධමනය සහ වෙළඳපොල',
+    'Photosynthesis & Light Reactions',
+    "Newton's Laws of Motion",
+    'Recursion & Algorithms',
+    'Inflation & Supply Curves',
   ];
 
   const handleGenerateQuiz = async (topicToUse?: string) => {
@@ -38,12 +38,12 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
         body: JSON.stringify({ topic: query, count: 3 }),
       });
       if (!res.ok) {
-        throw new Error('ප්‍රශ්නාවලිය ජනනය කිරීමට නොහැකි විය.');
+        throw new Error('Failed to generate interactive quiz questions.');
       }
       const data = await res.json();
       setQuestions(data.questions || []);
     } catch (err: any) {
-      setError(err.message || 'දෝෂයක් සිදුවිය. කරුණාකර නැවත උත්සාහ කරන්න.');
+      setError(err.message || 'An error occurred while generating the quiz.');
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,6 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
 
   const handleCheckAnswers = () => {
     setShowResults(true);
-    // calculate score
     let correctCount = 0;
     questions.forEach((q) => {
       if (selectedAnswers[q.id] === q.correctIndex) {
@@ -93,10 +92,10 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-base">
-              ස්වයං ඇගයීම සහ ප්‍රශ්නාවලිය (Self-Assessment Quiz)
+              Interactive Concept Quiz & Self-Assessment
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
-              ඔබ ඉගෙනගත් කරුණු නිවැරදිව තේරුම් ගෙන ඇත්දැයි සරල ප්‍රශ්න මඟින් පරීක්ෂා කර බලන්න.
+              Verify your conceptual understanding with targeted questions and everyday analogy explanations.
             </p>
           </div>
         </div>
@@ -106,7 +105,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
         {/* Search */}
         <div>
           <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-            ප්‍රශ්නාවලිය සඳහා මාතෘකාව ඇතුළත් කරන්න (Enter quiz topic):
+            Enter a topic or subject for your custom quiz:
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
             <input
@@ -117,7 +116,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleGenerateQuiz();
               }}
-              placeholder="උදා: Photosynthesis, Newton's Laws, Python Loops, Fractions..."
+              placeholder="e.g. Photosynthesis, Newton's Laws, Python Loops, Fractions, Opportunity Cost..."
               className="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white text-slate-900 placeholder:text-slate-400"
             />
             <button
@@ -129,19 +128,19 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>ප්‍රශ්න සකසමින්...</span>
+                  <span>Generating Quiz...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>ප්‍රශ්නාවලිය අරඹන්න</span>
+                  <span>Generate Quiz</span>
                 </>
               )}
             </button>
           </div>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-500">නිරූපණ මාතෘකා:</span>
+            <span className="text-[11px] text-slate-500">Sample Topics:</span>
             {starterTopics.map((top, idx) => (
               <button
                 key={idx}
@@ -168,7 +167,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
           <div className="space-y-4 pt-2">
             {questions.map((q, qIndex) => {
               const selected = selectedAnswers[q.id];
-              const isAnswered = selected !== undefined;
+              const isOptionSelected = selected !== undefined;
               const isCorrect = selected === q.correctIndex;
 
               return (
@@ -181,26 +180,26 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                       {qIndex + 1}
                     </span>
                     <h4 className="text-sm font-semibold text-slate-900 leading-snug">
-                      {q.questionSinhala}
+                      {q.question}
                     </h4>
                   </div>
 
                   {/* Options */}
                   <div className="space-y-2 pl-8">
                     {q.options.map((opt, optIndex) => {
-                      const isOptionSelected = selected === optIndex;
+                      const isOptionChosen = selected === optIndex;
                       const isThisCorrect = q.correctIndex === optIndex;
 
                       let btnStyle = 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/30';
                       if (showResults) {
                         if (isThisCorrect) {
                           btnStyle = 'bg-emerald-100 border-emerald-400 text-emerald-950 font-bold';
-                        } else if (isOptionSelected && !isCorrect) {
+                        } else if (isOptionChosen && !isCorrect) {
                           btnStyle = 'bg-red-100 border-red-300 text-red-950';
                         } else {
                           btnStyle = 'bg-slate-50 border-slate-200 text-slate-400 opacity-60';
                         }
-                      } else if (isOptionSelected) {
+                      } else if (isOptionChosen) {
                         btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold ring-1 ring-emerald-500';
                       }
 
@@ -216,7 +215,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                           {showResults && isThisCorrect && (
                             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                           )}
-                          {showResults && isOptionSelected && !isCorrect && (
+                          {showResults && isOptionChosen && !isCorrect && (
                             <XCircle className="w-4 h-4 text-red-500 shrink-0" />
                           )}
                         </button>
@@ -230,12 +229,12 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                       <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
                         <div className="flex items-center gap-1.5 font-bold mb-1">
                           <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
-                          <span>සරල පැහැදිලි කිරීම (Analogy Clue):</span>
+                          <span>Conceptual Explanation:</span>
                         </div>
-                        <p className="leading-relaxed">{q.explanationSinhala}</p>
+                        <p className="leading-relaxed">{q.explanation}</p>
                         {q.analogyClue && (
                           <p className="mt-1 text-[11px] text-amber-800 font-medium">
-                            💡 උපමා ඉඟිය: {q.analogyClue}
+                            💡 Analogy Clue: {q.analogyClue}
                           </p>
                         )}
                       </div>
@@ -250,7 +249,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
               {!showResults ? (
                 <>
                   <span className="text-xs text-slate-600">
-                    පිළිතුරු {Object.keys(selectedAnswers).length} / {questions.length} ක් තෝරා ඇත
+                    {Object.keys(selectedAnswers).length} of {questions.length} questions answered
                   </span>
                   <button
                     id="submit-quiz-answers-btn"
@@ -258,7 +257,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                     disabled={Object.keys(selectedAnswers).length === 0}
                     className="w-full sm:w-auto px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                   >
-                    පිළිතුරු පරීක්ෂා කරන්න
+                    Check Answers
                   </button>
                 </>
               ) : (
@@ -266,7 +265,7 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-amber-500" />
                     <span className="text-xs font-bold text-slate-900">
-                      ඔබේ ලකුණු: {calculateScore()} / {questions.length}
+                      Your Score: {calculateScore()} / {questions.length}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -278,17 +277,17 @@ export const QuizPanel: React.FC<QuizPanelProps> = ({ onAskChatQuestion }) => {
                       className="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>නැවත උත්සාහ කරන්න</span>
+                      <span>Retake Quiz</span>
                     </button>
                     <button
                       onClick={() =>
                         onAskChatQuestion(
-                          `මම "${topicInput || 'මෙම මාතෘකාව'}" ගැන ප්‍රශ්නාවලිය කළා. මට මෙහි වැරදුණු හෝ තව තේරුම් ගත යුතු කරුණු ගැන සරල උපමාවකින් වැඩිදුර පැහැදිලි කරන්න.`
+                          `I completed the quiz on "${topicInput || 'this topic'}". Please explain the concepts I missed with an intuitive everyday analogy.`
                         )
                       }
                       className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
                     >
-                      <span>AI ගුරුතුමාගෙන් තව අසන්න</span>
+                      <span>Review with AI Tutor</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>

@@ -6,9 +6,9 @@ import { ChatInput } from './components/ChatInput';
 import { AssignmentRoadmapPanel } from './components/AssignmentRoadmapPanel';
 import { AnalogyExplorerPanel } from './components/AnalogyExplorerPanel';
 import { QuizPanel } from './components/QuizPanel';
-import { SinglishHelperModal } from './components/SinglishHelperModal';
+import { StudyGuideModal } from './components/StudyGuideModal';
 import { ChatMessage, TutorMode, StudentLevel, TopicSuggestion } from './types';
-import { Sparkles, Loader2, BookOpen, HelpCircle, Lightbulb, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Sparkles, Loader2, BookOpen, HelpCircle, Lightbulb, CheckCircle2, MessageSquare, Compass, ArrowRight } from 'lucide-react';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -16,7 +16,7 @@ export default function App() {
   const [studentLevel, setStudentLevel] = useState<StudentLevel>('beginner');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
-  const [isSinglishModalOpen, setIsSinglishModalOpen] = useState<boolean>(false);
+  const [isStudyGuideOpen, setIsStudyGuideOpen] = useState<boolean>(false);
   const [activeSpeakingText, setActiveSpeakingText] = useState<string | null>(null);
   const [activeProblemText, setActiveProblemText] = useState<string>('');
 
@@ -32,10 +32,9 @@ export default function App() {
     }
   }, [messages, isLoading]);
 
-  // Handle Text-To-Speech
+  // Handle Text-To-Speech (English)
   const handleSpeakText = (text: string) => {
     if (!('speechSynthesis' in window)) {
-      alert('ඔබගේ බ්‍රවුසරය හඬ කියවීම (Speech Synthesis) සඳහා සහාය නොදක්වයි.');
       return;
     }
 
@@ -47,7 +46,6 @@ export default function App() {
       }
     }
 
-    // Clean markdown symbols for cleaner voice speech
     const cleanText = text
       .replace(/[*#`_~[\]()]/g, ' ')
       .replace(/https?:\/\/\S+/g, '')
@@ -55,8 +53,8 @@ export default function App() {
       .trim();
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'si-LK'; // Sinhala
-    utterance.rate = 0.95;
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0;
 
     utterance.onend = () => {
       setActiveSpeakingText(null);
@@ -122,12 +120,12 @@ export default function App() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(
-          errorData?.error || 'AI ගුරුතුමා සම්බන්ධ කරගැනීමේ දෝෂයක් සිදුවිය. කරුණාකර නැවත උත්සාහ කරන්න.'
+          errorData?.error || 'Failed to connect to the AI tutor. Please check your API configuration and try again.'
         );
       }
 
       if (!response.body) {
-        throw new Error('ප්‍රතිචාර ප්‍රවාහය (Stream) ලබාගත නොහැක.');
+        throw new Error('Response stream is not available.');
       }
 
       const reader = response.body.getReader();
@@ -141,7 +139,7 @@ export default function App() {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // Keep trailing incomplete segment
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -170,19 +168,18 @@ export default function App() {
         }
       }
 
-      // If audio enabled, speak completed message
       if (audioEnabled && accumulatedText) {
         handleSpeakText(accumulatedText);
       }
     } catch (err: any) {
       console.error('Chat error:', err);
-      const errMsg = err?.message || 'නැවත උත්සාහ කරන්න.';
+      const errMsg = err?.message || 'Unable to complete response.';
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === assistantMsgId
             ? {
                 ...msg,
-                content: `⚠️ **දෝෂයක් සිදුවිය:** ${errMsg}\n\nකරුණාකර Settings වෙතින් **GEMINI_API_KEY** නිවැරදිව ලබා දී ඇත්දැයි පරීක්ෂා කර නැවත උත්සාහ කරන්න.`,
+                content: `⚠️ **Error Encountered:** ${errMsg}\n\nPlease ensure your **GEMINI_API_KEY** is configured in your platform settings / environment variables.`,
               }
             : msg
         )
@@ -208,7 +205,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-amber-500/20 selection:text-amber-900">
+    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-indigo-500/20 selection:text-indigo-950 font-sans">
       {/* Top Navigation */}
       <Navbar
         mode={mode}
@@ -218,40 +215,40 @@ export default function App() {
         onResetChat={handleResetChat}
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
-        onOpenSinglishModal={() => setIsSinglishModalOpen(true)}
+        onOpenStudyGuide={() => setIsStudyGuideOpen(true)}
       />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left / Main Workspace Column */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          {/* Active Mode Notice / Mini Tab Bar */}
+          {/* Active Mode Notice Header */}
           <div className="flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border border-slate-200/80 shadow-2xs">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                {mode === 'concept' && <BookOpen className="w-4 h-4 text-amber-600" />}
-                {mode === 'assignment' && <HelpCircle className="w-4 h-4 text-orange-600" />}
-                {mode === 'analogy' && <Lightbulb className="w-4 h-4 text-amber-500" />}
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                {mode === 'concept' && <BookOpen className="w-4 h-4 text-indigo-600" />}
+                {mode === 'assignment' && <HelpCircle className="w-4 h-4 text-amber-600" />}
+                {mode === 'analogy' && <Lightbulb className="w-4 h-4 text-violet-600" />}
                 {mode === 'quiz' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                 <span>
-                  වත්මන් මාදිලිය:{' '}
-                  {mode === 'concept' && 'සංකල්ප ඉගෙනීම (Concept Learning)'}
-                  {mode === 'assignment' && 'පැවරුම් මඟපෙන්වීම (Socratic Guidance)'}
-                  {mode === 'analogy' && 'උපමා ගවේෂකය (Analogy Explorer)'}
-                  {mode === 'quiz' && 'ස්වයං ඇගයීම (Self Quiz)'}
+                  Active Workspace:{' '}
+                  {mode === 'concept' && 'Concept Learning & Intuitive Foundations'}
+                  {mode === 'assignment' && 'Socratic Homework Coach (Zero Direct Answers)'}
+                  {mode === 'analogy' && 'Everyday Analogy Mental Models'}
+                  {mode === 'quiz' && 'Interactive Knowledge Check'}
                 </span>
               </span>
             </div>
 
             <div className="text-[11px] font-medium text-slate-500">
-              {messages.length > 0 ? `${messages.length} පණිවිඩ` : 'සංවාදය සූදානම්'}
+              {messages.length > 0 ? `${messages.length} messages` : 'Ready to Learn'}
             </div>
           </div>
 
           {/* Chat Container */}
           <div
             ref={chatContainerRef}
-            className="flex-1 min-h-[440px] max-h-[640px] overflow-y-auto bg-slate-100/60 rounded-3xl p-4 sm:p-5 border border-slate-200/80 space-y-4"
+            className="flex-1 min-h-[440px] max-h-[640px] overflow-y-auto bg-slate-100/70 rounded-3xl p-4 sm:p-5 border border-slate-200/80 space-y-4 shadow-inner"
           >
             {messages.length === 0 ? (
               <WelcomeBanner
@@ -271,8 +268,8 @@ export default function App() {
 
             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex items-center gap-2 p-4 bg-white rounded-2xl border border-slate-200 text-xs text-slate-600 shadow-2xs">
-                <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
-                <span>AI ගුරුතුමා පිළිතුර සකසමින් සිටී...</span>
+                <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+                <span>AI Tutor is crafting guidance...</span>
               </div>
             )}
           </div>
@@ -282,13 +279,12 @@ export default function App() {
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
             mode={mode}
-            onOpenSinglishModal={() => setIsSinglishModalOpen(true)}
+            onOpenStudyGuide={() => setIsStudyGuideOpen(true)}
           />
         </div>
 
         {/* Right Interactive Sidebar Panels */}
         <div className="lg:col-span-4 space-y-5">
-          {/* Conditional panel based on current mode or quick access cards */}
           {mode === 'assignment' ? (
             <AssignmentRoadmapPanel
               activeProblemText={activeProblemText}
@@ -303,7 +299,6 @@ export default function App() {
           ) : mode === 'quiz' ? (
             <QuizPanel onAskChatQuestion={handleSendMessage} />
           ) : (
-            // Default Concept Mode: Show Quick Socratic Assignment Coach & Quick Analogy Tool
             <div className="space-y-4">
               <AnalogyExplorerPanel
                 studentLevel={studentLevel}
@@ -311,20 +306,21 @@ export default function App() {
                 onSpeakText={handleSpeakText}
               />
 
-              <div className="p-4 rounded-2xl bg-linear-to-br from-orange-50 to-amber-50 border border-orange-200/80 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 text-orange-950 font-bold text-xs">
-                  <HelpCircle className="w-4 h-4 text-orange-600" />
-                  <span>පැවරුමක් හෝ ගෙදර වැඩක් තියෙනවාද?</span>
+              <div className="p-4 rounded-2xl bg-linear-to-br from-amber-50 to-orange-50/70 border border-amber-200/80 shadow-2xs space-y-2.5">
+                <div className="flex items-center gap-2 text-amber-950 font-bold text-xs">
+                  <HelpCircle className="w-4 h-4 text-amber-600" />
+                  <span>Stuck on a homework problem?</span>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-relaxed">
-                  සෘජු පිළිතුර නොගෙන, ඔබ විසින්ම ගැටලුව විසඳා ගැනීමට AI ගුරුතුමාගේ Socratic මඟපෙන්වීම ලබාගන්න.
+                  Avoid the trap of copy-pasting solutions. Get Socratic questions that help you master the step-by-step logic.
                 </p>
                 <button
                   id="switch-to-assignment-mode-btn"
                   onClick={() => setMode('assignment')}
-                  className="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs"
+                  className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
                 >
-                  පැවරුම් මඟපෙන්වීමට පිවිසෙන්න
+                  <span>Open Socratic Homework Coach</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -332,10 +328,14 @@ export default function App() {
         </div>
       </main>
 
-      {/* Singlish Helper Modal */}
-      <SinglishHelperModal
-        isOpen={isSinglishModalOpen}
-        onClose={() => setIsSinglishModalOpen(false)}
+      {/* Study Strategy & Prompt Guide Modal */}
+      <StudyGuideModal
+        isOpen={isStudyGuideOpen}
+        onClose={() => setIsStudyGuideOpen(false)}
+        onInsertPrompt={(prompt) => {
+          setIsStudyGuideOpen(false);
+          handleSendMessage(prompt);
+        }}
       />
     </div>
   );

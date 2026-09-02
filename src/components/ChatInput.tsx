@@ -1,27 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff, Sparkles, Keyboard, HelpCircle, BookOpen, Lightbulb } from 'lucide-react';
+import { Send, Mic, MicOff, Sparkles, Compass, HelpCircle, BookOpen, Lightbulb } from 'lucide-react';
 import { TutorMode } from '../types';
-import { QUICK_PROMPTS_SINHALA } from '../data/sampleTopics';
+import { QUICK_PROMPTS_ENGLISH } from '../data/sampleTopics';
 
 interface ChatInputProps {
   onSendMessage: (text: string) => void;
   isLoading: boolean;
   mode: TutorMode;
-  onOpenSinglishModal: () => void;
+  onOpenStudyGuide: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
   isLoading,
   mode,
-  onOpenSinglishModal,
+  onOpenStudyGuide,
 }) => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  // Initialize Speech Recognition if supported
+  // Initialize Speech Recognition in English if supported
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -29,7 +29,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'si-LK'; // Sinhala Sri Lanka
+      recognition.lang = 'en-US';
 
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -53,7 +53,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const toggleRecording = () => {
     if (!recognitionRef.current) {
-      setVoiceNotice('බ්‍රවුසරය හඬ මඟින් ටයිප් කිරීම (Speech Recognition) සඳහා සහාය නොදක්වයි. කරුණාකර ටයිප් කරන්න.');
+      setVoiceNotice('Your browser does not support Speech Recognition. Please type your question.');
       setTimeout(() => setVoiceNotice(null), 4000);
       return;
     }
@@ -69,7 +69,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       } catch (err) {
         console.error(err);
         setIsRecording(false);
-        setVoiceNotice('මයික්‍රෆෝනය වෙත ප්‍රවේශය ලබාගත නොහැක.');
+        setVoiceNotice('Microphone access is unavailable.');
         setTimeout(() => setVoiceNotice(null), 4000);
       }
     }
@@ -101,12 +101,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const getModePlaceholder = () => {
     if (mode === 'assignment') {
-      return 'පැවරුම හෝ ඔබේ අදහස ඇතුළත් කරන්න (AI ගුරුතුමා සෘජු පිළිතුර නොදී මඟපෙන්වනු ඇත)...';
+      return 'Paste your assignment question or current step (I will guide you without giving direct solutions)...';
     }
     if (mode === 'analogy') {
-      return 'ඕනෑම සංකල්පයක් ලියන්න, එදිනෙදා ජීවිතයේ උපමාවකින් තේරුම් කර දෙන්නෙමු...';
+      return 'Type any complex concept (e.g., Recursion, Photosynthesis) for a vivid everyday analogy...';
     }
-    return 'ඔබට ඉගෙන ගැනීමට අවශ්‍ය ඕනෑම දෙයක් සිංහලෙන් හෝ English වලින් අසන්න...';
+    return 'Ask anything you want to learn simply and intuitively...';
   };
 
   return (
@@ -114,10 +114,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       {/* Quick Prompts Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
         <span className="text-[11px] text-slate-400 font-medium shrink-0 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-500" />
-          <span>ඉක්මන් විමසුම්:</span>
+          <Sparkles className="w-3 h-3 text-indigo-500" />
+          <span>Quick Prompts:</span>
         </span>
-        {QUICK_PROMPTS_SINHALA.map((prompt, idx) => (
+        {QUICK_PROMPTS_ENGLISH.map((prompt, idx) => (
           <button
             key={idx}
             type="button"
@@ -125,7 +125,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               setInput(prompt);
               if (textareaRef.current) textareaRef.current.focus();
             }}
-            className="shrink-0 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-amber-50 hover:text-amber-900 border border-slate-200 hover:border-amber-300 text-slate-700 transition-all font-medium text-[11px]"
+            className="shrink-0 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-900 border border-slate-200 hover:border-indigo-300 text-slate-700 transition-all font-medium text-[11px]"
           >
             {prompt}
           </button>
@@ -133,34 +133,34 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       </div>
 
       {/* Main Input Box */}
-      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all p-2">
+      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all p-2">
         {/* Mode Indicator Bar */}
         <div className="flex items-center justify-between px-2 pb-1.5 border-b border-slate-100 text-[11px] text-slate-500">
           <div className="flex items-center gap-1.5">
             {mode === 'assignment' ? (
-              <span className="text-orange-700 font-semibold flex items-center gap-1">
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>පැවරුම් ක්‍රමය: සෘජු පිළිතුරු නොදී සිතීමට ප්‍රශ්න අසයි</span>
+              <span className="text-amber-800 font-semibold flex items-center gap-1">
+                <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+                <span>Socratic Coach: Guided questions to help you solve it yourself</span>
               </span>
             ) : mode === 'analogy' ? (
-              <span className="text-amber-700 font-semibold flex items-center gap-1">
-                <Lightbulb className="w-3.5 h-3.5" />
-                <span>උපමා ක්‍රමය: එදිනෙදා ජීවිතයේ උදාහරණ කතාවලින්</span>
+              <span className="text-violet-800 font-semibold flex items-center gap-1">
+                <Lightbulb className="w-3.5 h-3.5 text-violet-600" />
+                <span>Everyday Analogy: Clear mental models mapped to real life</span>
               </span>
             ) : (
               <span className="text-slate-600 font-semibold flex items-center gap-1">
-                <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-                <span>සංකල්ප ඉගෙනීම: සරල පැහැදිලි කිරීම්</span>
+                <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Concept Learning: Step-by-step intuitive breakdown</span>
               </span>
             )}
           </div>
           <button
             type="button"
-            onClick={onOpenSinglishModal}
+            onClick={onOpenStudyGuide}
             className="flex items-center gap-1 text-slate-500 hover:text-slate-800 text-[11px] font-medium transition-colors"
           >
-            <Keyboard className="w-3 h-3 text-slate-400" />
-            <span>Singlish අකුරු උදව්</span>
+            <Compass className="w-3 h-3 text-slate-400" />
+            <span>Study Tips</span>
           </button>
         </div>
 
@@ -201,10 +201,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   ? 'bg-red-50 border-red-300 text-red-600 animate-pulse'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
-              title={isRecording ? 'හඬ පටිගත කිරීම නවත්වන්න' : 'හඬින් ප්‍රශ්නය අසන්න (Voice Input in Sinhala)'}
+              title={isRecording ? 'Stop voice recording' : 'Dictate with Voice (English)'}
             >
               {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              {isRecording && <span className="text-[11px] font-bold">සවන් දෙමින්...</span>}
+              {isRecording && <span className="text-[11px] font-bold">Listening...</span>}
             </button>
           </div>
 
@@ -213,9 +213,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             type="button"
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="flex items-center gap-1.5 px-4 py-2 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all"
           >
-            <span>විමසන්න</span>
+            <span>Ask Tutor</span>
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>

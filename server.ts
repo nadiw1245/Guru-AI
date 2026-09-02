@@ -15,7 +15,7 @@ app.use(express.json());
 const getGeminiClient = () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY පරිසර විචල්‍යය සකසා නොමැත. කරුණාකර Settings වෙතින් GEMINI_API_KEY ඇතුළත් කරන්න.");
+    throw new Error("GEMINI_API_KEY environment variable is missing. Please configure it in Settings / Secrets.");
   }
   return new GoogleGenAI({
     apiKey,
@@ -62,36 +62,35 @@ async function generateWithFallback(ai: GoogleGenAI, contents: any, config: any,
 }
 
 const SYSTEM_INSTRUCTION_BASE = `
-You are an expert, friendly, and deeply encouraging AI tutor (මිත්‍රශීලී සිංහල AI ගුරුතුමා).
-Your mission is to make learning enjoyable, deeply intuitive, and empowering for students.
+You are an expert, friendly, and deeply encouraging AI tutor.
+Your mission is to make learning intuitive, enjoyable, and empowering for all students.
 
-PRIMARY DIRECTIVES:
+CORE TUTOR DIRECTIVES:
 1. WHEN TEACHING A NEW CONCEPT:
-   - Always explain it simply and intuitively using everyday, relatable Sri Lankan / daily life analogies (උපමා) (e.g. making milk tea, cricket matches, riding a CTB bus, pol sambol, market vendors, water tanks, kites, bicycle gears, coconut scrapes).
-   - Write predominantly in clear, grammatically correct, natural, and polite Sinhala (සිංහල).
-   - Whenever introducing technical or academic terms, provide the English word in brackets next to the Sinhala term (e.g. ප්‍රභාසංස්ලේෂණය (Photosynthesis), විචල්‍යයන් (Variables), ඝනත්වය (Density)).
-   - Keep paragraphs concise, well-formatted with markdown, bolding, and bullet points.
-   - Conclude with a warm check question to ensure understanding.
+   - Always explain it simply and intuitively using relatable, vivid everyday analogies (e.g. cooking, sports, cars, restaurants, baking, water plumbing, library shelves, electricity grids, board games).
+   - Break down complex concepts into step-by-step building blocks.
+   - Format with clean markdown, bullet points, and bold keywords for effortless readability.
+   - Finish with a brief, friendly check question to verify comprehension.
 
 2. WHEN HELPING WITH ASSIGNMENTS, HOMEWORK, OR PROBLEMS:
-   - CRITICAL RULE: NEVER EVER GIVE THE DIRECT ANSWER OR FULL WORKED SOLUTION TO AN ASSIGNMENT OR TEST PROBLEM.
-   - Use the SOCRATIC METHOD (සොක්‍රටීස් ක්‍රමය):
-     * Acknowledge the question with enthusiasm.
-     * Identify the core concept or formula involved without solving it.
-     * Ask 1 or 2 targeted, gentle guiding questions (මඟපෙන්වන ප්‍රශ්න) to help the student break down the first step on their own.
-     * If the student gives an answer or makes an attempt:
-       - If correct: Celebrate their effort warmly and guide them to the next step.
-       - If incorrect: Point out what part was great, clarify the misconception with a simple analogy, and ask a modified guiding question.
-     * Encourage critical thinking, patience, and self-confidence.
+   - ABSOLUTE RULE: NEVER provide the direct final answer or write complete worked solutions for homework problems or exam questions.
+   - Use the SOCRATIC METHOD:
+     * Acknowledge the question with encouragement.
+     * Identify the core concept or principle without performing the calculations.
+     * Ask 1 or 2 targeted, gentle guiding questions to help the student break down the first step on their own.
+     * If the student provides an answer or thought:
+       - If correct: Warmly celebrate their reasoning and prompt them toward the next milestone.
+       - If incorrect: Point out what part of their thinking was great, clarify the misconception with a simple analogy, and ask an easier guiding question.
+     * Build self-confidence and genuine mastery.
 
 3. TONE & PERSONALITY:
-   - Warm, respectful, encouraging, patient, and motivating (මිත්‍රශීලී, කාරුණික, සහෝදරත්වයෙන් යුත් ගුරු පෞරුෂය).
-   - Use friendly Sinhala address terms like "යාලුවා / පුතා / දුවේ / ඔයා".
+   - Enthusiastic, patient, supportive, clear, and intellectually curious.
+   - Communicate strictly in clean, natural, and engaging English.
 `;
 
 // Health check endpoint
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", service: "Sinhala AI Tutor API" });
+  res.json({ status: "ok", service: "AI Concept & Homework Tutor API" });
 });
 
 // Chat Streaming Endpoint (SSE)
@@ -108,27 +107,26 @@ app.post("/api/chat/stream", async (req, res) => {
     let modeSpecificInstruction = "";
     if (mode === "assignment") {
       modeSpecificInstruction = `
-CURRENT MODE: ASSIGNMENT / HOMEWORK GUIDANCE (පැවරුම් මඟපෙන්වීම)
-Strict rule: DO NOT provide direct answers, complete code, or numerical solutions.
-Ask 1-2 focused guiding questions (මඟපෙන්වන ප්‍රශ්න). Break down the first step only.
-Encourage the student to reply with their thought or attempt.
+CURRENT MODE: ASSIGNMENT & SOCRATIC HOMEWORK COACH
+Strict rule: DO NOT provide the final answer, complete code, or direct numerical solution.
+Ask 1-2 focused guiding questions. Guide the student on the first step only.
+Encourage the student to reply with their thinking or next attempt.
 `;
     } else if (mode === "analogy") {
       modeSpecificInstruction = `
-CURRENT MODE: DEEP ANALOGY EXPLORER (උපමා ගවේෂණය)
-Focus heavily on crafting vivid, unforgettable, and humorous or everyday real-life Sri Lankan analogies for the topic asked.
-Explain step-by-step how each element of the real-world analogy maps to the scientific/technical concept.
+CURRENT MODE: EVERYDAY ANALOGY EXPLORER
+Focus deeply on crafting vivid, creative, and relatable everyday analogies for the topic.
+Explicitly map the components of the analogy to the actual scientific or technical mechanisms.
 `;
     } else if (mode === "quiz") {
       modeSpecificInstruction = `
-CURRENT MODE: KNOWLEDGE CHECK (දැනුම පරීක්ෂාව)
-Ask a short, interactive conceptual question in Sinhala based on what was discussed to verify comprehension.
-Provide multiple choice options or a friendly thought-provoking question.
+CURRENT MODE: CONCEPTUAL KNOWLEDGE CHECK
+Ask a short, interactive thought-provoking question to test the student's conceptual grasp.
 `;
     } else {
       modeSpecificInstruction = `
-CURRENT MODE: CONCEPT TEACHING (සංකල්ප ඉගැන්වීම)
-Explain simply with relatable analogies, real-world examples in Sinhala, and brief English terminology in brackets.
+CURRENT MODE: CONCEPT TEACHING
+Explain simply and clearly with everyday analogies and real-world applications.
 `;
     }
 
@@ -198,13 +196,12 @@ app.post("/api/concept/explain", async (req, res) => {
 Concept: "${concept}"
 
 Provide the response in structured JSON with:
-1. titleSinhala: Clear Sinhala title
-2. titleEnglish: English title
-3. shortSummarySinhala: 2-3 sentence simple explanation in Sinhala
-4. everydayAnalogySinhala: A vivid, everyday analogy in Sinhala (e.g. household, market, transport, cricket, food)
-5. keyPointsSinhala: Array of 3-4 bullet points explaining the core mechanics
-6. englishGlossary: Array of objects { englishTerm: string, sinhalaMeaning: string }
-7. guidingQuestionSinhala: A thought-provoking question to check student understanding
+1. title: Clear conceptual title in English
+2. shortSummary: 2-3 sentence intuitive overview in English
+3. everydayAnalogy: A vivid, memorable everyday analogy (e.g., kitchen cooking, sports, cars, plumbing, games, library)
+4. keyMechanics: Array of 3-4 bullet points explaining the core principles
+5. vocabulary: Array of objects { term: string, definition: string }
+6. guidingQuestion: A thought-provoking question to check student understanding
 `;
 
     const response: any = await generateWithFallback(ai, prompt, {
@@ -213,35 +210,33 @@ Provide the response in structured JSON with:
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          titleSinhala: { type: Type.STRING },
-          titleEnglish: { type: Type.STRING },
-          shortSummarySinhala: { type: Type.STRING },
-          everydayAnalogySinhala: { type: Type.STRING },
-          keyPointsSinhala: {
+          title: { type: Type.STRING },
+          shortSummary: { type: Type.STRING },
+          everydayAnalogy: { type: Type.STRING },
+          keyMechanics: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
           },
-          englishGlossary: {
+          vocabulary: {
             type: Type.ARRAY,
             items: {
               type: Type.OBJECT,
               properties: {
-                englishTerm: { type: Type.STRING },
-                sinhalaMeaning: { type: Type.STRING },
+                term: { type: Type.STRING },
+                definition: { type: Type.STRING },
               },
-              required: ["englishTerm", "sinhalaMeaning"],
+              required: ["term", "definition"],
             },
           },
-          guidingQuestionSinhala: { type: Type.STRING },
+          guidingQuestion: { type: Type.STRING },
         },
         required: [
-          "titleSinhala",
-          "titleEnglish",
-          "shortSummarySinhala",
-          "everydayAnalogySinhala",
-          "keyPointsSinhala",
-          "englishGlossary",
-          "guidingQuestionSinhala",
+          "title",
+          "shortSummary",
+          "everydayAnalogy",
+          "keyMechanics",
+          "vocabulary",
+          "guidingQuestion",
         ],
       },
     });
@@ -268,16 +263,16 @@ app.post("/api/assignment/roadmap", async (req, res) => {
 "${problemText}"
 
 CRITICAL RULE: DO NOT SOLVE THE PROBLEM OR GIVE THE FINAL ANSWER.
-Instead, create a Socratic learning roadmap in Sinhala.
+Instead, create a Socratic learning roadmap in English.
 
 Provide structured JSON with:
-1. problemSubjectSinhala: Subject/Field in Sinhala (e.g. ගණිතය, භෞතික විද්‍යාව, පරිගණක)
-2. keyPrinciplesSinhala: Array of fundamental theories/formulas/principles involved (without doing calculations)
+1. problemSubject: Subject/Field in English (e.g., Algebra, Classical Physics, Computer Science, Chemistry, Biology)
+2. keyPrinciples: Array of fundamental theories/formulas/principles involved (without performing calculations)
 3. steps: Array of 3 to 4 roadmap steps:
    - stepNumber: number (1, 2, 3...)
-   - titleSinhala: Step milestone title (e.g. "ප්‍රශ්නයේ දත්ත හඳුනාගැනීම", "අදාළ සූත්‍රය තෝරාගැනීම")
-   - guidingQuestionSinhala: A Socratic question to guide the student on this specific step
-4. starterMessageSinhala: Warm opening message in Sinhala initiating the first step.
+   - title: Step milestone title (e.g. "Identify Given Data & Constraints", "Determine Core Relationship", "Set Up the Algebraic Expression")
+   - guidingQuestion: A Socratic question to guide the student on this specific step
+4. starterMessage: Warm opening message in English initiating the first step.
 `;
 
     const response: any = await generateWithFallback(ai, prompt, {
@@ -286,8 +281,8 @@ Provide structured JSON with:
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          problemSubjectSinhala: { type: Type.STRING },
-          keyPrinciplesSinhala: {
+          problemSubject: { type: Type.STRING },
+          keyPrinciples: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
           },
@@ -297,19 +292,19 @@ Provide structured JSON with:
               type: Type.OBJECT,
               properties: {
                 stepNumber: { type: Type.INTEGER },
-                titleSinhala: { type: Type.STRING },
-                guidingQuestionSinhala: { type: Type.STRING },
+                title: { type: Type.STRING },
+                guidingQuestion: { type: Type.STRING },
               },
-              required: ["stepNumber", "titleSinhala", "guidingQuestionSinhala"],
+              required: ["stepNumber", "title", "guidingQuestion"],
             },
           },
-          starterMessageSinhala: { type: Type.STRING },
+          starterMessage: { type: Type.STRING },
         },
         required: [
-          "problemSubjectSinhala",
-          "keyPrinciplesSinhala",
+          "problemSubject",
+          "keyPrinciples",
           "steps",
-          "starterMessageSinhala",
+          "starterMessage",
         ],
       },
     });
@@ -328,17 +323,17 @@ app.post("/api/quiz/generate", async (req, res) => {
     const { topic = "General Science", count = 3 } = req.body;
     const ai = getGeminiClient();
 
-    const prompt = `Generate ${count} fun, educational, conceptual multiple-choice quiz questions in Sinhala based on: "${topic}".
-Each question should test conceptual understanding (not just rote memorization) and include an everyday analogy in the explanation.
+    const prompt = `Generate ${count} engaging, conceptual multiple-choice quiz questions in English based on: "${topic}".
+Each question should test deep conceptual understanding and include an everyday analogy clue in the explanation.
 
 Provide structured JSON:
 questions: Array of:
 - id: string
-- questionSinhala: Question text in Sinhala
-- options: Array of 4 options in Sinhala
+- question: Question text in English
+- options: Array of 4 options in English
 - correctIndex: number (0 to 3)
-- explanationSinhala: Clear, friendly explanation in Sinhala
-- analogyClue: Short analogy hint in Sinhala
+- explanation: Clear, encouraging conceptual explanation
+- analogyClue: Short everyday analogy hint
 `;
 
     const response: any = await generateWithFallback(ai, prompt, {
@@ -353,21 +348,21 @@ questions: Array of:
               type: Type.OBJECT,
               properties: {
                 id: { type: Type.STRING },
-                questionSinhala: { type: Type.STRING },
+                question: { type: Type.STRING },
                 options: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
                 },
                 correctIndex: { type: Type.INTEGER },
-                explanationSinhala: { type: Type.STRING },
+                explanation: { type: Type.STRING },
                 analogyClue: { type: Type.STRING },
               },
               required: [
                 "id",
-                "questionSinhala",
+                "question",
                 "options",
                 "correctIndex",
-                "explanationSinhala",
+                "explanation",
                 "analogyClue",
               ],
             },
@@ -402,7 +397,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Sinhala AI Tutor server running on http://0.0.0.0:${PORT}`);
+    console.log(`AI Tutor server running on http://0.0.0.0:${PORT}`);
   });
 }
 
