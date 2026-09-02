@@ -1,0 +1,10 @@
+{
+  "name": "Sinhala AI Tutor",
+  "description": "An expert, friendly Sinhala AI tutor explaining complex concepts with everyday analogies and guiding homework with Socratic questions.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
