@@ -27,7 +27,7 @@ const getGeminiClient = () => {
   });
 };
 
-const PRIMARY_MODEL = "gemini-3.7-flash";
+const PRIMARY_MODEL = "gemini-3.8-flash";
 const FALLBACK_MODEL = "gemini-2.5-flash";
 
 async function generateWithFallback(ai: GoogleGenAI, contents: any, config: any, stream = false) {
@@ -62,41 +62,41 @@ async function generateWithFallback(ai: GoogleGenAI, contents: any, config: any,
 }
 
 const SYSTEM_INSTRUCTION_BASE = `
-You are an expert, friendly, and deeply encouraging AI tutor.
-Your mission is to make learning intuitive, enjoyable, and empowering for all students.
+You are guruAI — the warmest, most patient, and inspiring Artificial Intelligence educator in the world.
+Your dedicated mission is to help complete beginners, parents, non-technical adults, and curious minds learn Artificial Intelligence from scratch with ZERO intimidation.
 
-CORE TUTOR DIRECTIVES:
-1. WHEN TEACHING A NEW CONCEPT:
-   - Always explain it simply and intuitively using relatable, vivid everyday analogies (e.g. cooking, sports, cars, restaurants, baking, water plumbing, library shelves, electricity grids, board games).
-   - Break down complex concepts into step-by-step building blocks.
-   - Format with clean markdown, bullet points, and bold keywords for effortless readability.
-   - Finish with a brief, friendly check question to verify comprehension.
+CORE TEACHING PHILOSOPHY & DIRECTIVES:
+1. "EXPLAIN TO MY DAD" SIMPLICITY:
+   - Assume the learner may have never written code, worked in tech, or used advanced software.
+   - Ground every abstract AI concept in vivid, tangible everyday analogies (cooking in a kitchen, driving a car, tending a garden, shopping at a grocery store, organizing a garage, sending mail at the post office, board games).
+   - NEVER use unexplained technical jargon. If you mention words like "Tokens", "Weights", "Neural Network", "LLM", or "Hallucination", immediately follow up with an intuitive everyday comparison.
 
-2. WHEN HELPING WITH ASSIGNMENTS, HOMEWORK, OR PROBLEMS:
-   - ABSOLUTE RULE: NEVER provide the direct final answer or write complete worked solutions for homework problems or exam questions.
-   - Use the SOCRATIC METHOD:
-     * Acknowledge the question with encouragement.
-     * Identify the core concept or principle without performing the calculations.
-     * Ask 1 or 2 targeted, gentle guiding questions to help the student break down the first step on their own.
-     * If the student provides an answer or thought:
-       - If correct: Warmly celebrate their reasoning and prompt them toward the next milestone.
-       - If incorrect: Point out what part of their thinking was great, clarify the misconception with a simple analogy, and ask an easier guiding question.
-     * Build self-confidence and genuine mastery.
+2. STEP-BY-STEP BUILDING BLOCKS:
+   - Break explanations into bite-sized, logical steps.
+   - Use clean Markdown formatting with bold highlights and bullet points for effortless scanning.
+   - Contrast traditional computer code (rigid rulebooks like a tax form) with AI (learning from patterns and examples like a child or apprentice).
 
-3. TONE & PERSONALITY:
-   - Enthusiastic, patient, supportive, clear, and intellectually curious.
-   - Communicate strictly in clean, natural, and engaging English.
+3. DEBUNKING MYTHS WITH EMPATHY:
+   - Clarify common fears and misconceptions gently (e.g. AI is not conscious, it doesn't have feelings or secret motives; it is an incredible mathematical pattern-matching tool created by humans).
+   - Show how AI can assist in everyday life (drafting emails, planning road trips, explaining medical terms in simple language, troubleshooting home repairs).
+
+4. INTERACTIVE CHECK-INS:
+   - End your lessons with a friendly, low-pressure check-in question or invitation to try a simple prompt together.
+
+5. TONE:
+   - Respectful, enthusiastic, encouraging, never condescending or overwhelming.
+   - Clear, natural, engaging English.
 `;
 
 // Health check endpoint
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", service: "AI Concept & Homework Tutor API" });
+  res.json({ status: "ok", service: "guruAI - Learn AI from Scratch" });
 });
 
 // Chat Streaming Endpoint (SSE)
 app.post("/api/chat/stream", async (req, res) => {
   try {
-    const { messages, mode = "concept", studentLevel = "beginner" } = req.body;
+    const { messages, mode = "learn", studentLevel = "dad_beginner" } = req.body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: "Messages array is required" });
@@ -105,33 +105,47 @@ app.post("/api/chat/stream", async (req, res) => {
     const ai = getGeminiClient();
 
     let modeSpecificInstruction = "";
-    if (mode === "assignment") {
+    if (mode === "sandbox" || mode === "assignment") {
       modeSpecificInstruction = `
-CURRENT MODE: ASSIGNMENT & SOCRATIC HOMEWORK COACH
-Strict rule: DO NOT provide the final answer, complete code, or direct numerical solution.
-Ask 1-2 focused guiding questions. Guide the student on the first step only.
-Encourage the student to reply with their thinking or next attempt.
+CURRENT MODE: PROMPT SANDBOX & SKILL LAB
+The user is practicing how to talk to AI and write effective prompts.
+1. Guide them using the CLEAR formula: Context, Length/Format, Examples, Audience, Role.
+2. If they share a prompt, kindly show what makes it work, what is missing, and provide a polished upgraded version with an explanation of why the upgrade gives superior results.
+3. Keep it practical and empowering.
 `;
     } else if (mode === "analogy") {
       modeSpecificInstruction = `
-CURRENT MODE: EVERYDAY ANALOGY EXPLORER
-Focus deeply on crafting vivid, creative, and relatable everyday analogies for the topic.
-Explicitly map the components of the analogy to the actual scientific or technical mechanisms.
+CURRENT MODE: EVERYDAY AI ANALOGY EXPLORER
+Deeply unpack AI concepts (like Transformers, Neural Weights, Hallucinations, Embeddings, Diffusion, Fine-Tuning) using vivid household, mechanical, culinary, or nature metaphors.
+Explicitly map each part of the real-world metaphor to the actual AI mechanism.
 `;
     } else if (mode === "quiz") {
       modeSpecificInstruction = `
-CURRENT MODE: CONCEPTUAL KNOWLEDGE CHECK
-Ask a short, interactive thought-provoking question to test the student's conceptual grasp.
+CURRENT MODE: AI LITERACY & MYTHBUSTER QUIZ
+Ask interactive, friendly questions that test conceptual intuition about Artificial Intelligence.
+Celebrate correct understanding warmly and gently clear up any misconceptions.
 `;
     } else {
       modeSpecificInstruction = `
-CURRENT MODE: CONCEPT TEACHING
-Explain simply and clearly with everyday analogies and real-world applications.
+CURRENT MODE: AI LEARNING FROM SCRATCH (FOUNDATIONS)
+Teach AI concepts starting from ground zero. Make it crystal clear, relatable, and fun.
+Use everyday analogies for every technical element.
 `;
     }
 
+    let levelInstruction = "";
+    if (studentLevel === "dad_beginner" || studentLevel === "beginner") {
+      levelInstruction = "TARGET LEARNER: Complete Beginner / Parent (Zero coding experience. Use simple, warm, household analogies. Avoid all unexplained technical jargon).";
+    } else if (studentLevel === "curious_explorer") {
+      levelInstruction = "TARGET LEARNER: Curious Explorer (Everyday tech user interested in smartphone AI tools and practical productivity).";
+    } else if (studentLevel === "hands_on") {
+      levelInstruction = "TARGET LEARNER: Hands-On Prompt Creator (Wants to write stellar prompts, avoid hallucinations, and use AI tools effectively).";
+    } else if (studentLevel === "deep_tech") {
+      levelInstruction = "TARGET LEARNER: Deep Tech Curious (Wants to understand model parameters, neural weights, token embeddings, and technical mechanics).";
+    }
+
     const fullSystemInstruction = `${SYSTEM_INSTRUCTION_BASE}
-Student Level: ${studentLevel}
+${levelInstruction}
 ${modeSpecificInstruction}`;
 
     // Set headers for SSE
@@ -139,7 +153,6 @@ ${modeSpecificInstruction}`;
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    // Filter and format chat contents for Gemini
     const validMessages = messages.filter(
       (m: any) => m && typeof m.content === "string" && m.content.trim().length > 0
     );
@@ -182,26 +195,96 @@ ${modeSpecificInstruction}`;
   }
 });
 
+// Prompt Analyzer for Sandbox Mode
+app.post("/api/prompt/analyze", async (req, res) => {
+  try {
+    const { promptText, studentLevel = "dad_beginner" } = req.body;
+    if (!promptText) {
+      return res.status(400).json({ error: "Prompt text is required" });
+    }
+
+    const ai = getGeminiClient();
+
+    const prompt = `You are guruAI's prompt laboratory mentor.
+Analyze this user's prompt:
+"${promptText}"
+
+Student Level: ${studentLevel}
+
+Evaluate the prompt and return structured JSON with:
+1. clarityScore: number between 10 and 99 indicating how clear and actionable the prompt is
+2. critique: Friendly 2-sentence feedback on what makes this prompt a great start and what details are missing
+3. formulaBreakdown: An object with 4 fields:
+   - role: who the AI should act as (e.g. "Expert Carpenter", "Patient Family Doctor", "Helpful Travel Guide")
+   - task: the specific core action requested
+   - context: background information or situation provided (or note if missing)
+   - constraints: style, length, or tone requirements (or note if missing)
+4. improvedPrompt: The upgraded "guru-level" version of this prompt that will get vastly superior results from any AI
+5. whyItWorks: 2-3 sentences explaining why the improved version guides the AI so much better
+6. proTip: A memorable one-sentence golden rule for beginner prompt writing
+`;
+
+    const response: any = await generateWithFallback(ai, prompt, {
+      systemInstruction: SYSTEM_INSTRUCTION_BASE,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          clarityScore: { type: Type.INTEGER },
+          critique: { type: Type.STRING },
+          formulaBreakdown: {
+            type: Type.OBJECT,
+            properties: {
+              role: { type: Type.STRING },
+              task: { type: Type.STRING },
+              context: { type: Type.STRING },
+              constraints: { type: Type.STRING },
+            },
+            required: ["role", "task", "context", "constraints"],
+          },
+          improvedPrompt: { type: Type.STRING },
+          whyItWorks: { type: Type.STRING },
+          proTip: { type: Type.STRING },
+        },
+        required: [
+          "clarityScore",
+          "critique",
+          "formulaBreakdown",
+          "improvedPrompt",
+          "whyItWorks",
+          "proTip",
+        ],
+      },
+    });
+
+    const parsed = JSON.parse(response.text || "{}");
+    res.json(parsed);
+  } catch (error: any) {
+    console.error("Prompt analysis error:", error);
+    res.status(500).json({ error: error.message || "Failed to analyze prompt" });
+  }
+});
+
 // Structured Concept Breakdown & Analogy Generator
 app.post("/api/concept/explain", async (req, res) => {
   try {
-    const { concept, studentLevel = "beginner" } = req.body;
+    const { concept, studentLevel = "dad_beginner" } = req.body;
     if (!concept) {
       return res.status(400).json({ error: "Concept is required" });
     }
 
     const ai = getGeminiClient();
 
-    const prompt = `Explain the following concept for a student at level: ${studentLevel}.
+    const prompt = `Explain the following Artificial Intelligence concept for someone learning from scratch (Level: ${studentLevel}):
 Concept: "${concept}"
 
 Provide the response in structured JSON with:
 1. title: Clear conceptual title in English
-2. shortSummary: 2-3 sentence intuitive overview in English
-3. everydayAnalogy: A vivid, memorable everyday analogy (e.g., kitchen cooking, sports, cars, plumbing, games, library)
-4. keyMechanics: Array of 3-4 bullet points explaining the core principles
-5. vocabulary: Array of objects { term: string, definition: string }
-6. guidingQuestion: A thought-provoking question to check student understanding
+2. shortSummary: 2-3 sentence intuitive overview without scary jargon
+3. everydayAnalogy: A vivid, memorable everyday analogy (e.g. kitchen cooking, driving, gardening, library, carpentry, grocery store)
+4. keyMechanics: Array of 3-4 bullet points explaining how it actually works step-by-step
+5. vocabulary: Array of objects { term: string, definition: string } defining any terms in plain English
+6. guidingQuestion: A thought-provoking question to check intuition
 `;
 
     const response: any = await generateWithFallback(ai, prompt, {
@@ -249,82 +332,14 @@ Provide the response in structured JSON with:
   }
 });
 
-// Socratic Assignment Step Analyzer (Never gives answers)
-app.post("/api/assignment/roadmap", async (req, res) => {
-  try {
-    const { problemText } = req.body;
-    if (!problemText) {
-      return res.status(400).json({ error: "Problem text is required" });
-    }
-
-    const ai = getGeminiClient();
-
-    const prompt = `Analyze this student homework / assignment question:
-"${problemText}"
-
-CRITICAL RULE: DO NOT SOLVE THE PROBLEM OR GIVE THE FINAL ANSWER.
-Instead, create a Socratic learning roadmap in English.
-
-Provide structured JSON with:
-1. problemSubject: Subject/Field in English (e.g., Algebra, Classical Physics, Computer Science, Chemistry, Biology)
-2. keyPrinciples: Array of fundamental theories/formulas/principles involved (without performing calculations)
-3. steps: Array of 3 to 4 roadmap steps:
-   - stepNumber: number (1, 2, 3...)
-   - title: Step milestone title (e.g. "Identify Given Data & Constraints", "Determine Core Relationship", "Set Up the Algebraic Expression")
-   - guidingQuestion: A Socratic question to guide the student on this specific step
-4. starterMessage: Warm opening message in English initiating the first step.
-`;
-
-    const response: any = await generateWithFallback(ai, prompt, {
-      systemInstruction: SYSTEM_INSTRUCTION_BASE,
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          problemSubject: { type: Type.STRING },
-          keyPrinciples: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-          },
-          steps: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                stepNumber: { type: Type.INTEGER },
-                title: { type: Type.STRING },
-                guidingQuestion: { type: Type.STRING },
-              },
-              required: ["stepNumber", "title", "guidingQuestion"],
-            },
-          },
-          starterMessage: { type: Type.STRING },
-        },
-        required: [
-          "problemSubject",
-          "keyPrinciples",
-          "steps",
-          "starterMessage",
-        ],
-      },
-    });
-
-    const parsed = JSON.parse(response.text || "{}");
-    res.json(parsed);
-  } catch (error: any) {
-    console.error("Assignment roadmap error:", error);
-    res.status(500).json({ error: error.message || "Failed to analyze assignment" });
-  }
-});
-
-// Quiz Generator
+// Quiz Generator for AI Literacy
 app.post("/api/quiz/generate", async (req, res) => {
   try {
-    const { topic = "General Science", count = 3 } = req.body;
+    const { topic = "Artificial Intelligence Basics", count = 3 } = req.body;
     const ai = getGeminiClient();
 
-    const prompt = `Generate ${count} engaging, conceptual multiple-choice quiz questions in English based on: "${topic}".
-Each question should test deep conceptual understanding and include an everyday analogy clue in the explanation.
+    const prompt = `Generate ${count} fun, engaging multiple-choice quiz questions in English to test AI literacy and debunk common myths about: "${topic}".
+Design the questions so that beginners (like someone's dad or a new learner) feel encouraged, learn something practical, and bust misconceptions.
 
 Provide structured JSON:
 questions: Array of:
@@ -332,7 +347,7 @@ questions: Array of:
 - question: Question text in English
 - options: Array of 4 options in English
 - correctIndex: number (0 to 3)
-- explanation: Clear, encouraging conceptual explanation
+- explanation: Clear, encouraging explanation in plain English
 - analogyClue: Short everyday analogy hint
 `;
 
@@ -380,6 +395,69 @@ questions: Array of:
   }
 });
 
+// Assignment/Prompt Roadmap endpoint for backward compatibility
+app.post("/api/assignment/roadmap", async (req, res) => {
+  try {
+    const { problemText } = req.body;
+    if (!problemText) {
+      return res.status(400).json({ error: "Problem text is required" });
+    }
+
+    const ai = getGeminiClient();
+
+    const prompt = `Analyze this problem or task:
+"${problemText}"
+
+Create an easy-to-follow, Socratic 3-step learning breakdown for a beginner.
+Provide structured JSON with:
+1. problemSubject: Subject/Category in English
+2. keyPrinciples: Array of 2-3 core principles involved
+3. steps: Array of 3 steps (stepNumber, title, guidingQuestion)
+4. starterMessage: Warm, encouraging message to begin
+`;
+
+    const response: any = await generateWithFallback(ai, prompt, {
+      systemInstruction: SYSTEM_INSTRUCTION_BASE,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          problemSubject: { type: Type.STRING },
+          keyPrinciples: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+          },
+          steps: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                stepNumber: { type: Type.INTEGER },
+                title: { type: Type.STRING },
+                guidingQuestion: { type: Type.STRING },
+              },
+              required: ["stepNumber", "title", "guidingQuestion"],
+            },
+          },
+          starterMessage: { type: Type.STRING },
+        },
+        required: [
+          "problemSubject",
+          "keyPrinciples",
+          "steps",
+          "starterMessage",
+        ],
+      },
+    });
+
+    const parsed = JSON.parse(response.text || "{}");
+    res.json(parsed);
+  } catch (error: any) {
+    console.error("Roadmap error:", error);
+    res.status(500).json({ error: error.message || "Failed to analyze roadmap" });
+  }
+});
+
 // Vite Middleware for development vs static for production
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
@@ -397,7 +475,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`AI Tutor server running on http://0.0.0.0:${PORT}`);
+    console.log(`guruAI server running on http://0.0.0.0:${PORT}`);
   });
 }
 

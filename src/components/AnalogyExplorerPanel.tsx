@@ -28,12 +28,13 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
   const [analogyData, setAnalogyData] = useState<AnalogyData | null>(null);
 
   const popularConcepts = [
-    { title: 'REST APIs', query: 'What is a REST API in web development?' },
-    { title: 'Photosynthesis', query: 'How does Photosynthesis work?' },
-    { title: "Newton's 3rd Law", query: "Newton's 3rd Law of Motion: Action and Reaction" },
-    { title: 'Economic Inflation', query: 'What causes Inflation and purchasing power decline?' },
-    { title: 'Blockchain & Consensus', query: 'How Blockchain distributed ledgers work' },
-    { title: 'Neural Networks & Weights', query: 'How Artificial Neural Networks learn patterns' },
+    { title: 'What is a Token?', query: 'What are tokens in Large Language Models and why does AI count them?' },
+    { title: 'Neural Networks', query: 'How does an Artificial Neural Network learn patterns from data?' },
+    { title: 'AI Hallucinations', query: 'Why does AI make up fake information or hallucinate?' },
+    { title: 'AI Temperature', query: 'What is Temperature in AI and how does it change creativity?' },
+    { title: 'Training Data & Overfitting', query: 'How is AI trained on data and what does overfitting mean?' },
+    { title: 'Diffusion & Image Gen', query: 'How do Diffusion models create photos from scratch?' },
+    { title: 'RAG (Grounding)', query: 'What is RAG (Retrieval-Augmented Generation) in plain English?' },
   ];
 
   const handleGenerate = async (conceptToFetch?: string) => {
@@ -70,10 +71,10 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-base">
-              Everyday Analogy Explorer
+              Everyday AI Analogy Explorer
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
-              Demystify complex technical, mathematical, and scientific concepts with tangible everyday mental models.
+              Demystify buzzwords like Tokens, Transformers, and Neural Networks with intuitive household and real-world analogies.
             </p>
           </div>
         </div>
@@ -83,7 +84,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
         {/* Search / Input */}
         <div>
           <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-            Enter any concept or topic you want to understand:
+            Enter any AI concept, buzzword, or term you want explained simply:
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
             <input
@@ -94,14 +95,14 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleGenerate();
               }}
-              placeholder="e.g. Gravity, Docker Containers, Recursion, RAM vs SSD, Keynesian Economics..."
+              placeholder="e.g. Tokens, Neural Network, Hallucination, Training Weights, Diffusion, Fine-Tuning..."
               className="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white text-slate-900 placeholder:text-slate-400"
             />
             <button
               id="generate-analogy-btn"
               onClick={() => handleGenerate()}
               disabled={loading || !conceptInput.trim()}
-              className="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0"
+              className="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -119,7 +120,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
 
           {/* Quick Concept Badges */}
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-500 font-medium">Popular Topics:</span>
+            <span className="text-[11px] text-slate-500 font-medium">Core AI Terms:</span>
             {popularConcepts.map((item, idx) => (
               <button
                 key={idx}
@@ -127,7 +128,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
                   setConceptInput(item.query);
                   handleGenerate(item.query);
                 }}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-violet-50 hover:text-violet-900 border border-slate-200 hover:border-violet-200 text-slate-700 transition-all font-medium"
+                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-violet-50 hover:text-violet-900 border border-slate-200 hover:border-violet-200 text-slate-700 transition-all font-medium cursor-pointer"
               >
                 {item.title}
               </button>
@@ -149,7 +150,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-[10px] font-bold tracking-wider text-violet-800 uppercase px-2 py-0.5 rounded-md bg-violet-100/80 border border-violet-200">
-                    Concept Breakdown
+                    guruAI Mental Model
                   </span>
                   <h4 className="text-base font-bold text-slate-900 mt-1">
                     {analogyData.title}
@@ -162,7 +163,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
                         `${analogyData.title}. ${analogyData.shortSummary}. Everyday Analogy: ${analogyData.everydayAnalogy}`
                       )
                     }
-                    className="p-2 rounded-lg bg-white/80 hover:bg-white text-slate-600 hover:text-violet-700 border border-slate-200/80 shadow-2xs transition-colors"
+                    className="p-2 rounded-lg bg-white/80 hover:bg-white text-slate-600 hover:text-violet-700 border border-slate-200/80 shadow-2xs transition-colors cursor-pointer"
                     title="Read aloud"
                   >
                     <Volume2 className="w-4 h-4" />
@@ -179,7 +180,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               <div className="bg-violet-100/60 border border-violet-300/80 rounded-xl p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-violet-900">
                   <Lightbulb className="w-4 h-4 text-violet-600" />
-                  <span>The Everyday Analogy:</span>
+                  <span>The Everyday Household Analogy:</span>
                 </div>
                 <p className="text-xs text-slate-900 leading-relaxed font-medium">
                   {analogyData.everydayAnalogy}
@@ -190,7 +191,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               <div>
                 <h5 className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Key Principles & Mechanics:</span>
+                  <span>How It Actually Works Under the Hood:</span>
                 </h5>
                 <ul className="space-y-1 pl-1">
                   {analogyData.keyMechanics.map((pt, idx) => (
@@ -206,7 +207,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               {analogyData.vocabulary?.length > 0 && (
                 <div className="pt-2 border-t border-indigo-200/60">
                   <h5 className="text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1.5">
-                    Key Terminology & Definitions:
+                    Plain-English Definitions:
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                     {analogyData.vocabulary.map((item, idx) => (
@@ -226,7 +227,7 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
               <div className="bg-slate-900 text-white p-3.5 rounded-xl space-y-2">
                 <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold">
                   <HelpCircle className="w-4 h-4" />
-                  <span>Check Your Intuition (Guiding Question):</span>
+                  <span>Check Your Intuition:</span>
                 </div>
                 <p className="text-xs text-slate-200 font-medium">
                   {analogyData.guidingQuestion}
@@ -238,10 +239,10 @@ export const AnalogyExplorerPanel: React.FC<AnalogyExplorerPanelProps> = ({
                         `Regarding the concept "${analogyData.title}", you asked: "${analogyData.guidingQuestion}". Here is my reasoning: `
                       )
                     }
-                    className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors"
+                    className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Answer & Discuss with Tutor</span>
+                    <span>Discuss with guruAI</span>
                   </button>
                 </div>
               </div>

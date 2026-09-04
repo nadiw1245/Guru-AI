@@ -1,57 +1,100 @@
-# 🎓 AI Concept & Homework Tutor
+# 🤖 guruAI — Learn Artificial Intelligence From Scratch
 
-> **An intelligent, Socratic AI learning companion powered by Google Gemini, designed to make complex concepts intuitive through vivid everyday analogies and guided problem-solving.**
+> **The zero-intimidation, analogy-powered AI learning platform designed specifically for beginners, parents, and curious minds who have never written code or used AI before.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.0-61dafb.svg?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646cff.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8.svg?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Gemini API](https://img.shields.io/badge/Google_GenAI-Gemini_3.7_Flash-4285f4.svg?logo=google&logoColor=white)](https://aistudio.google.com/)
+[![Gemini API](https://img.shields.io/badge/Google_GenAI-Gemini_3.8_Flash-4285f4.svg?logo=google&logoColor=white)](https://aistudio.google.com/)
 
 ---
 
-## 📖 Overview
+## 🌟 The Story Behind guruAI
 
-The **AI Concept & Homework Tutor** bridges the gap between rote memorization and deep conceptual mastery. Traditional AI assistants often provide immediate final answers to homework problems, robbing students of the learning journey. This tutor adheres strictly to the **Socratic Method**—asking targeted guiding questions while using relatable everyday analogies (e.g. cooking, plumbing, sports, city traffic) to transform abstract theories into tangible mental models.
+> *"My father told me he didn't know anything about AI and felt left behind by the fast-moving tech world. I built guruAI so that anyone—parents, seniors, students, and complete beginners—can understand and master Artificial Intelligence from scratch, with zero fear and zero jargon."*
 
----
+Most AI tutorials are filled with intimidating academic jargon: *backpropagation, vector embeddings, loss gradients, tokenization*. **guruAI throws all that jargon out the window.** 
 
-## ✨ Core Highlights
-
-- 💡 **Everyday Analogy Engine**: Translates complex STEM and humanities concepts (Quantum Superposition, Docker Containers, Recursion, Inflation) into vivid, relatable analogies with component mappings.
-- 🎯 **Socratic Homework Guidance**: Strict zero-spoilers policy—never hands over direct solutions, final calculations, or complete code; guides the student step-by-step.
-- 🗺️ **Assignment Roadmap Generator**: Scans assignment problem statements, extracts core subject principles, and generates structured milestone questions.
-- 📝 **Interactive Concept Quizzes**: Generates conceptual self-assessment quizzes with analogy clues, detailed rationale, and score feedback.
-- 🎙️ **Voice & Audio Accessibility**: Built-in speech recognition for voice input and native speech synthesis for audio readout.
-- 🧭 **Study Tips & Active Recall**: Integrated study guide modal with the Feynman technique, prompt templates, and active learning strategies.
+Instead, guruAI teaches how AI works using **real-life, household analogies**—comparing Neural Networks to a bakery assembly line, Tokens to Scrabble letter tiles, and Temperature to how adventurous a chef is with spices.
 
 ---
 
-## 🏗️ Architecture & Project Structure
+## ✨ Key Features
+
+### 1. 📖 Step-by-Step "AI 101" Learning Path
+- Structured conversational lessons starting from ground zero:
+  - **What is AI really?** (Not a sentient robot or magic; a powerful pattern finder like a master recipe book).
+  - **How does AI learn?** (Training with feedback like training a puppy vs rigid traditional rule manuals).
+  - **How do LLMs talk?** (Next-word prediction, like ultra-smart phone autocomplete).
+  - **Why does AI make things up?** (Understanding hallucinations and how to spot them).
+  - **Can AI feel emotions?** (Debunking common Hollywood sci-fi myths with science and logic).
+
+### 2. 🧪 Interactive Prompt Sandbox & Skill Lab
+- Practice talking to AI in a hands-on simulator!
+- Type any beginner prompt (or pick everyday tasks like writing an email, home repairs, trip planning).
+- **Objective Clarity Score (0-100)**: Instant feedback on how clear your prompt is.
+- **The 4-Pillars Breakdown**: Inspects **Role**, **Task**, **Context**, and **Constraints**.
+- **guruAI Master Upgrade**: Generates an upgraded prompt with an explanation of why it gets 10x better results.
+- **One-Click Test in Chat**: Send the upgraded prompt directly into the live tutor conversation with a single click!
+- **Creativity / Temperature Dial**: Visual slider explaining how temperature affects AI behavior (from grandma's strict recipe to wild exotic spice experiments).
+
+### 3. 💡 Everyday AI Analogy Explorer
+- Deep-dive into specific AI buzzwords:
+  - **Tokens** → Like syllables and Scrabble tiles.
+  - **Neural Networks** → Like an expert bakery assembly line.
+  - **Diffusion Models** → Like an artist chiseling away static noise until a photograph appears.
+  - **Hallucinations** → Like a charismatic dinner guest improvising when they forget exact details.
+  - **RAG (Grounding)** → Like giving the AI an open reference textbook before it writes an exam.
+
+### 4. 🏆 AI Literacy & Mythbusters Quiz
+- Multiple-choice self-assessments designed to build confidence.
+- Clears up common anxieties (e.g., *"Will AI take over everything?", "Can AI think on its own?"*).
+- Instant explanations with celebration confetti when you succeed!
+
+### 5. 👨‍🦳 "Dad & Beginner" Persona (Level Selector)
+- **👨‍🦳 Dad & Complete Beginner**: Zero technical jargon, patient, warm, kitchen/garage/car analogies.
+- **🎒 Curious Explorer**: Practical smartphone tools, everyday productivity, clear examples.
+- **🛠️ Prompt Creator**: Writing powerful prompts, avoiding hallucinations, mastering AI tools.
+- **🔬 Deep Tech Curious**: Model architectures, neural weights, token embeddings, and technical mechanics.
+
+### 6. 🎙️ Accessibility & Voice Read-Aloud
+- **Speech Synthesis (Read-Aloud)**: Click the speaker button or toggle voice mode to listen to answers.
+- **Voice Dictation (Microphone)**: Ask questions verbally using browser speech recognition.
+
+---
+
+## 🏗️ Technical Architecture
+
+guruAI is built with a modern full-stack architecture running React 19 and Express:
 
 ```text
-├── server.ts                  # Express server & Gemini API endpoints (SSE Streaming, Analogy, Roadmap, Quiz)
-├── index.html                 # Main HTML entry point
-├── package.json               # Scripts & dependencies
+├── server.ts                  # Express server & Gemini API endpoints
+│                                - /api/chat/stream (SSE streaming with guruAI persona)
+│                                - /api/prompt/analyze (Prompt scoring & 4-pillar upgrade)
+│                                - /api/concept/explain (AI buzzwords -> household analogies)
+│                                - /api/quiz/generate (Interactive AI literacy quizzes)
+├── index.html                 # HTML entry point & font links
+├── package.json               # Dependencies & scripts
 ├── vite.config.ts             # Vite configuration with Tailwind CSS plugin
 ├── tsconfig.json              # TypeScript compilation setup
 ├── src/
 │   ├── main.tsx               # Client entry point
 │   ├── App.tsx                # Primary workspace layout & state orchestration
 │   ├── types.ts               # Shared TypeScript interfaces & types
-│   ├── index.css              # Global styling & typography definitions
+│   ├── index.css              # Global styling & Tailwind CSS v4 definitions
 │   ├── data/
-│   │   └── sampleTopics.ts    # Pre-configured topics, levels, and prompt starters
+│   │   └── sampleTopics.ts    # AI beginner curriculum, quick questions, and preset prompts
 │   └── components/
 │       ├── Navbar.tsx         # Responsive header, level selector, and mode tabs
-│       ├── WelcomeBanner.tsx  # Interactive onboarding banner & featured starter cards
-│       ├── ChatMessageItem.tsx# Message bubble with Markdown formatting & TTS controls
+│       ├── WelcomeBanner.tsx  # Interactive onboarding banner & curriculum cards
+│       ├── ChatMessageItem.tsx# Message bubble with Markdown, badges & TTS readout
 │       ├── ChatInput.tsx      # Multi-line chat input with voice dictation & prompt chips
-│       ├── AnalogyExplorerPanel.tsx # Dedicated concept-to-analogy breakdown panel
-│       ├── AssignmentRoadmapPanel.tsx # Step-by-step Socratic problem analyzer
-│       ├── QuizPanel.tsx      # Conceptual assessment quiz generator with confetti
-│       └── StudyGuideModal.tsx# Socratic learning guide & prompt template copier
+│       ├── PromptSandboxPanel.tsx # Interactive prompt lab, scoring & upgrade generator
+│       ├── AnalogyExplorerPanel.tsx # AI buzzword mental model generator
+│       ├── QuizPanel.tsx      # Interactive AI literacy quiz with confetti
+│       └── StudyGuideModal.tsx# Beginner guide with top 4 AI myths debunked & CLEAR formula
 └── dist/                      # Production build output
 ```
 
@@ -65,11 +108,11 @@ The **AI Concept & Homework Tutor** bridges the gap between rote memorization an
 - [npm](https://www.npmjs.com/) or `pnpm` / `yarn`
 - A [Google Gemini API Key](https://aistudio.google.com/)
 
-### 1. Clone the Repository
+### 1. Clone the Project
 
 ```bash
-git clone https://github.com/your-username/ai-concept-homework-tutor.git
-cd ai-concept-homework-tutor
+git clone https://github.com/your-username/guruAI.git
+cd guruAI
 ```
 
 ### 2. Install Dependencies
@@ -80,18 +123,18 @@ npm install
 
 ### 3. Setup Environment Variables
 
-Copy the example `.env` file and add your Google Gemini API key:
+Copy the `.env.example` file and configure your API key:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env`:
+Add your Gemini API key to `.env`:
 ```env
 GEMINI_API_KEY="your_gemini_api_key_here"
 ```
 
-### 4. Run the Development Server
+### 4. Run Development Server
 
 ```bash
 npm run dev
@@ -101,42 +144,47 @@ Open your browser and navigate to `http://localhost:3000`.
 
 ---
 
-## 🛠️ Build & Deployment
+## 🐙 How to Update Your GitHub Repository
 
-### Production Build
-
-Compile the React frontend with Vite and bundle the Node.js server using `esbuild`:
+To push this codebase to your own GitHub account:
 
 ```bash
-npm run build
+# 1. Initialize git (if not already initialized)
+git init
+
+# 2. Stage all project files
+git add .
+
+# 3. Create your initial commit
+git commit -m "feat: launch guruAI platform to learn AI from scratch"
+
+# 4. Set the default branch to main
+git branch -M main
+
+# 5. Link your GitHub repository (replace with your repo URL)
+git remote add origin https://github.com/<YOUR-USERNAME>/guruAI.git
+
+# 6. Push your code to GitHub
+git push -u origin main
 ```
 
-### Start Production Server
-
+If you already have a repository and want to push updates:
 ```bash
-npm run start
-```
-
-### Linting & Type Checking
-
-```bash
-npm run lint
+git add .
+git commit -m "feat: convert platform to guruAI to teach AI from scratch"
+git push origin main
 ```
 
 ---
 
-## 🔌 API Reference
+## 🛡️ Model Configuration & Fallback
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Service health status check. |
-| `POST` | `/api/chat/stream` | Server-Sent Events (SSE) streaming chat endpoint supporting `concept`, `assignment`, `analogy`, and `quiz` modes. |
-| `POST` | `/api/concept/explain` | Generates a structured JSON breakdown containing title, summary, everyday analogy, key mechanics, and vocabulary. |
-| `POST` | `/api/assignment/roadmap` | Generates a 3-4 milestone Socratic problem-solving roadmap without revealing final solutions. |
-| `POST` | `/api/quiz/generate` | Generates a customized multiple-choice quiz with conceptual explanations and analogy hints. |
+guruAI uses the `@google/genai` SDK with automatic model resilience:
+- **Primary Model**: `gemini-3.8-flash` for blazing fast, highly articulate streaming responses.
+- **Fallback Model**: `gemini-2.5-flash` for automatic high availability.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is open-source and licensed under the [MIT License](LICENSE).

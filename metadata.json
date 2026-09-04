@@ -1,6 +1,6 @@
 {
-  "name": "AI Concept & Homework Tutor",
-  "description": "An expert, friendly AI tutor explaining complex concepts with intuitive everyday analogies and guiding homework with Socratic questions.",
+  "name": "guruAI",
+  "description": "Learn Artificial Intelligence from scratch with guruAI. Made for absolute beginners, parents, and curious minds using everyday analogies, interactive prompt sandboxes, and zero-intimidation lessons.",
   "requestFramePermissions": [
     "microphone"
   ],

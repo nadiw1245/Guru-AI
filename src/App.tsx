@@ -3,22 +3,30 @@ import { Navbar } from './components/Navbar';
 import { WelcomeBanner } from './components/WelcomeBanner';
 import { ChatMessageItem } from './components/ChatMessageItem';
 import { ChatInput } from './components/ChatInput';
-import { AssignmentRoadmapPanel } from './components/AssignmentRoadmapPanel';
+import { PromptSandboxPanel } from './components/PromptSandboxPanel';
 import { AnalogyExplorerPanel } from './components/AnalogyExplorerPanel';
 import { QuizPanel } from './components/QuizPanel';
 import { StudyGuideModal } from './components/StudyGuideModal';
 import { ChatMessage, TutorMode, StudentLevel, TopicSuggestion } from './types';
-import { Sparkles, Loader2, BookOpen, HelpCircle, Lightbulb, CheckCircle2, MessageSquare, Compass, ArrowRight } from 'lucide-react';
+import {
+  Sparkles,
+  Loader2,
+  BookOpen,
+  Sliders,
+  Lightbulb,
+  CheckCircle2,
+  Compass,
+  ArrowRight,
+} from 'lucide-react';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [mode, setMode] = useState<TutorMode>('concept');
-  const [studentLevel, setStudentLevel] = useState<StudentLevel>('beginner');
+  const [mode, setMode] = useState<TutorMode>('learn');
+  const [studentLevel, setStudentLevel] = useState<StudentLevel>('dad_beginner');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [isStudyGuideOpen, setIsStudyGuideOpen] = useState<boolean>(false);
   const [activeSpeakingText, setActiveSpeakingText] = useState<string | null>(null);
-  const [activeProblemText, setActiveProblemText] = useState<string>('');
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -120,7 +128,7 @@ export default function App() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(
-          errorData?.error || 'Failed to connect to the AI tutor. Please check your API configuration and try again.'
+          errorData?.error || 'Failed to connect to guruAI. Please check your API configuration and try again.'
         );
       }
 
@@ -192,17 +200,13 @@ export default function App() {
   // Handle Starter Topic Selection
   const handleSelectTopic = (topic: TopicSuggestion) => {
     setMode(topic.mode);
-    if (topic.mode === 'assignment') {
-      setActiveProblemText(topic.prompt);
-    }
     handleSendMessage(topic.prompt, topic.mode);
   };
 
-  // Handle Socratic Assignment Guidance initiation
-  const handleStartAssignmentGuidance = (problemText: string) => {
-    setMode('assignment');
-    handleSendMessage(problemText, 'assignment');
-  };
+  const isLearnMode = mode === 'learn' || mode === 'concept';
+  const isSandboxMode = mode === 'sandbox' || mode === 'assignment';
+  const isAnalogyMode = mode === 'analogy';
+  const isQuizMode = mode === 'quiz';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-indigo-500/20 selection:text-indigo-950 font-sans">
@@ -226,16 +230,16 @@ export default function App() {
           <div className="flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border border-slate-200/80 shadow-2xs">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                {mode === 'concept' && <BookOpen className="w-4 h-4 text-indigo-600" />}
-                {mode === 'assignment' && <HelpCircle className="w-4 h-4 text-amber-600" />}
-                {mode === 'analogy' && <Lightbulb className="w-4 h-4 text-violet-600" />}
-                {mode === 'quiz' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                {isLearnMode && <BookOpen className="w-4 h-4 text-indigo-600" />}
+                {isSandboxMode && <Sliders className="w-4 h-4 text-amber-600" />}
+                {isAnalogyMode && <Lightbulb className="w-4 h-4 text-violet-600" />}
+                {isQuizMode && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                 <span>
-                  Active Workspace:{' '}
-                  {mode === 'concept' && 'Concept Learning & Intuitive Foundations'}
-                  {mode === 'assignment' && 'Socratic Homework Coach (Zero Direct Answers)'}
-                  {mode === 'analogy' && 'Everyday Analogy Mental Models'}
-                  {mode === 'quiz' && 'Interactive Knowledge Check'}
+                  Active Mode:{' '}
+                  {isLearnMode && 'AI 101: Learn Artificial Intelligence from Scratch'}
+                  {isSandboxMode && 'Prompt Sandbox & Lab: Learn How to Talk to AI'}
+                  {isAnalogyMode && 'Everyday Household AI Analogies'}
+                  {isQuizMode && 'AI Literacy & Mythbuster Quiz'}
                 </span>
               </span>
             </div>
@@ -269,7 +273,7 @@ export default function App() {
             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex items-center gap-2 p-4 bg-white rounded-2xl border border-slate-200 text-xs text-slate-600 shadow-2xs">
                 <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
-                <span>AI Tutor is crafting guidance...</span>
+                <span>guruAI is thinking & crafting your explanation...</span>
               </div>
             )}
           </div>
@@ -279,47 +283,46 @@ export default function App() {
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
             mode={mode}
-            onOpenStudyGuide={() => setIsStudyGuideOpen(true)}
+            onOpenStudyGuide={() => setIsStudyGuideOpen(false)}
           />
         </div>
 
         {/* Right Interactive Sidebar Panels */}
         <div className="lg:col-span-4 space-y-5">
-          {mode === 'assignment' ? (
-            <AssignmentRoadmapPanel
-              activeProblemText={activeProblemText}
-              onStartAssignmentGuidance={handleStartAssignmentGuidance}
+          {isSandboxMode ? (
+            <PromptSandboxPanel
+              onSendToChat={(prompt) => handleSendMessage(prompt, 'sandbox')}
+              studentLevel={studentLevel}
             />
-          ) : mode === 'analogy' ? (
+          ) : isAnalogyMode ? (
             <AnalogyExplorerPanel
               studentLevel={studentLevel}
               onAskFollowUp={handleSendMessage}
               onSpeakText={handleSpeakText}
             />
-          ) : mode === 'quiz' ? (
+          ) : isQuizMode ? (
             <QuizPanel onAskChatQuestion={handleSendMessage} />
           ) : (
             <div className="space-y-4">
-              <AnalogyExplorerPanel
+              <PromptSandboxPanel
+                onSendToChat={(prompt) => handleSendMessage(prompt, 'sandbox')}
                 studentLevel={studentLevel}
-                onAskFollowUp={handleSendMessage}
-                onSpeakText={handleSpeakText}
               />
 
-              <div className="p-4 rounded-2xl bg-linear-to-br from-amber-50 to-orange-50/70 border border-amber-200/80 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 text-amber-950 font-bold text-xs">
-                  <HelpCircle className="w-4 h-4 text-amber-600" />
-                  <span>Stuck on a homework problem?</span>
+              <div className="p-4 rounded-2xl bg-linear-to-br from-violet-50 to-indigo-50/70 border border-violet-200/80 shadow-2xs space-y-2.5">
+                <div className="flex items-center gap-2 text-violet-950 font-bold text-xs">
+                  <Lightbulb className="w-4 h-4 text-violet-600" />
+                  <span>Confused by an AI buzzword?</span>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-relaxed">
-                  Avoid the trap of copy-pasting solutions. Get Socratic questions that help you master the step-by-step logic.
+                  Explore how Tokens, Neural Networks, Hallucinations, and Image Diffusion work using simple everyday kitchen and garage metaphors.
                 </p>
                 <button
-                  id="switch-to-assignment-mode-btn"
-                  onClick={() => setMode('assignment')}
-                  className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+                  id="switch-to-analogy-mode-btn"
+                  onClick={() => setMode('analogy')}
+                  className="w-full py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <span>Open Socratic Homework Coach</span>
+                  <span>Open Everyday AI Analogies</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -328,7 +331,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* Study Strategy & Prompt Guide Modal */}
+      {/* Beginner Strategy & Mythbuster Guide Modal */}
       <StudyGuideModal
         isOpen={isStudyGuideOpen}
         onClose={() => setIsStudyGuideOpen(false)}
